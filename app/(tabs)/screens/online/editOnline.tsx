@@ -1,17 +1,31 @@
-import { Image, StyleSheet, Platform , View ,Text ,Pressable , ScrollView , TextInput , Switch  , KeyboardAvoidingView , useColorScheme}from 'react-native';
+import { Image, StyleSheet, Platform , View ,Text ,Pressable , ScrollView , TextInput , Switch ,useColorScheme }from 'react-native';
 import React, { useState , useEffect } from 'react'
-
+import DateTimePicker from 'react-native-ui-datepicker';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DateTimePickerModal from "react-native-modal-datetime-picker"
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
+import { getFirestore, doc, updateDoc , deleteDoc} from "firebase/firestore";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TimerPickerModal } from "react-native-timer-picker";
 import { LinearGradient } from "expo-linear-gradient"; // or `import LinearGradient from "react-native-linear-gradient"`
 import { Audio } from "expo-av"; // for audio feedback (click sound as you scroll)
 import * as Haptics from "expo-haptics"
 import moment from 'moment';
-import { Loading } from './loading';
-export default function Add({navigation}) {
+import { Loading } from '../loading';
+import app from '@/firebaseConnect';
+
+
+
+
+
+export default function EditOnline({route , navigation}) {
+
+  const [darkMode , setDarkmode] = useState("");
+  const db = getFirestore(app);
+  const colorScheme = useColorScheme();
+
+  const {time , tarih ,not , baslik , bld ,id} = route.params
 
   function formatDate(inputDate) {
     const date = new Date(inputDate); // Stringi Date nesnesine çevir
@@ -24,17 +38,18 @@ export default function Add({navigation}) {
   }
   
   const formattedDate = formatDate(new Date());
-  const colorScheme = useColorScheme();
+
 
 
 //
   const [alarmString, setAlarmString] = useState<
           string | null
       >(null);
-  const [note , setNote] = useState("Note");
-  const [title , setTitle] = useState("BAŞLIK");  
-  const [date, setDate] = useState(formattedDate);
-  const [noti , setNoti] = useState(false);
+
+  const [note , setNote] = useState(not);
+  const [title , setTitle] = useState(baslik);  
+  const [date, setDate] = useState(tarih);  
+  const [noti , setNoti] = useState(bld);
   const [ loading , setLoading] =useState(false);  
   //
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -45,59 +60,56 @@ export default function Add({navigation}) {
 
 
       useEffect(() => {
-        
+      
+
+        setDarkmode(colorScheme);
+        console.log("seted" , darkMode)
         if (alarmString === null) {
-          const currentTime = moment().format('HH:mm'); 
-          setAlarmString(currentTime);
+          setAlarmString(time);
         }
+        
       }, [alarmString]);
-      const addData = async () => {
-        setLoading(true);
-        const data = {
+
+      const updateDataById = async (id) => {
+
+        const newData = {
           tarih: date,
           time: alarmString,
           not: note,
           baslik: title,
-          bld: noti
+          
         };
-      
-        try {
-     
-          const existingData = await AsyncStorage.getItem('allData');
-          let dataArray = [];
-      
+
+        const document = doc(db, 'data', id);
         
-          if (existingData) {
-            try {
-              dataArray = JSON.parse(existingData); 
-              if (!Array.isArray(dataArray)) { 
-                dataArray = [];
-              }
+        try {
+
+
+          await updateDoc(document, newData);
+          console.log('Document successfully updated!');
+          console.log("saved");
+          navigation.navigate('Homeonline');
+
+
+        } catch (error) {
+          console.error('Error updating document: ', error);
+        }
+
+      };
+      
+
+      const deleteDataById = async (id) => {
+        try {
+          // Tüm veriyi al
+          await deleteDoc(doc(db, "data", id));
             } catch (error) {
               console.log('JSON parse hatası:', error);
             }
-          }
-      
+          };
+          // İlgili id'yi bul ve diziden çıkar
           
-          let lastId = await AsyncStorage.getItem('lastId');
-          lastId = lastId ? parseInt(lastId, 10) : 0; 
-      
-          const newData = { id: lastId + 1, ...data }; 
-          dataArray.push(newData); 
-      
         
-          await AsyncStorage.setItem('allData', JSON.stringify(dataArray));
-         
-          await AsyncStorage.setItem('lastId', (lastId + 1).toString());
       
-          console.log('Veri başarıyla kaydedildi.');
-          setLoading(false);
-        } catch (e) {
-          console.log('Veriyi kaydetme hatası: ', e);
-          setLoading(false);
-        }
-      };
-
 
       const formatTime = ({
         hours,
@@ -124,14 +136,21 @@ export default function Add({navigation}) {
 
     console.log(alarmString)
   function save(){
-    console.log("saved");
-    addData();
-    navigation.navigate('Home')
+    
+    updateDataById(id);
+    
+  
 
   };
   function cancel(){
     console.log("canceled")
-    navigation.navigate('Home')
+    navigation.navigate('Homeonline')
+  };
+
+  function delet(){
+    deleteDataById(id);
+    navigation.navigate('Homeonline')
+
   };
 ///////////////
   const handleConfirm = (date) => {
@@ -211,13 +230,11 @@ export default function Add({navigation}) {
                  onPress={()=>{setShowPicker(true)}} 
                 style={styles.tabs} >
                   <View style={{marginLeft:"8%"}} >
-                     <FontAwesome6    name="clock" size={35} color="#8ca87c" />
+                     <FontAwesome6    name="calendar" size={35} color="#8ca87c" />
                   </View>
-                 
                   <Text style={styles.dataTex} >{alarmString}</Text></Pressable>
 
           <TimerPickerModal
-            
             visible={showPicker}
             setIsVisible={setShowPicker}
             onConfirm={(pickedDuration) => {
@@ -231,7 +248,7 @@ export default function Add({navigation}) {
             LinearGradient={LinearGradient}
             Haptics={Haptics}
             styles={{
-                theme: "dark",
+                theme:"dark",
             }}
             modalProps={{
                 overlayOpacity: 0.1,
@@ -241,6 +258,7 @@ export default function Add({navigation}) {
         </View>
           <View style={{height:"80%",width:"100%", alignItems:"center",marginTop:"12%" }} >
                     <TextInput
+                    value={title}
                     onChangeText={(text)=>{setTitle(text)}} 
                     placeholderTextColor="#8ca87c"
                     placeholder='TITLE'
@@ -253,6 +271,7 @@ export default function Add({navigation}) {
                     </TextInput>
 
                     <TextInput
+                    value={note}
                     onChangeText={(note)=>{setNote(note)}} 
                     placeholderTextColor="#8ca87c"
                     placeholder='NOTE'
@@ -281,9 +300,16 @@ export default function Add({navigation}) {
                     <View style={styles.saveComp}>
 
 
+
+                    <Pressable 
+                    onPress={delet}
+                    style={[styles.sBton,{borderWidth:1}]} >
+                        <Text style={styles.saveBT} >DELETE</Text>
+                      </Pressable>
+
                     <Pressable 
                     onPress={cancel}
-                    style={[styles.sBton,{borderWidth:0.4}]} >
+                    style={[styles.sBton,{borderWidth:1}]} >
                         <Text style={styles.saveBT} >cancel</Text>
                       </Pressable>
 
@@ -404,7 +430,10 @@ const styles = StyleSheet.create({
       
 
     },
-   
+    dataData:{
+      flex:1,
+      borderWidth:1
+    },
     calView:{
       flex:1,
       borderRadius:16,
@@ -430,12 +459,12 @@ const styles = StyleSheet.create({
       height:"20%",
       width:"90%",
       borderBottomWidth:2,
-      borderColor:"#8ca87c",
       marginBottom:16,
       textAlign:"center",
       fontSize:35,
       fontWeight:"bold",
       color:"#8ca87c",
+      borderColor:"#8ca87c"
       
 
     },
@@ -460,7 +489,7 @@ const styles = StyleSheet.create({
     },
     sBton:{
       height:"100%",
-      width:80,
+      width:90,
       marginLeft:12,
       alignItems:"center",
       justifyContent:"center",

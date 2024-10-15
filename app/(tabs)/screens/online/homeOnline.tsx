@@ -1,14 +1,14 @@
 import { Image, StyleSheet, Platform , View ,Text ,Pressable , ScrollView , RefreshControl ,  useColorScheme ,}from 'react-native';
-import { StretchInY } from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState , useEffect } from 'react'
-import { Loading } from './loading';
+import {  getFirestore, collection, query, where, getDocs , doc ,deleteDoc} from "firebase/firestore"; 
+import React, { useState , useEffect, version } from 'react'
+import { Loading } from '../loading';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { getAuth  } from "firebase/auth";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import app from "../../../../firebaseConnect"
 
 
-
-export default function HomeScreen({ navigation }) {
+export default function OnlineHome({ navigation }) {
   
   const [refresh , setRefresh] =useState(false);
   const [tofayD , setToday] = useState([]);
@@ -17,25 +17,42 @@ export default function HomeScreen({ navigation }) {
   const [textColor , setTextColor] = useState('');
   const[loading , setLoadig]= useState(false);
 
-const getData = async () => {
-  setLoadig(true)
-      try {
-        
-    
-        const note = await AsyncStorage.getItem('allData');
-        setData( note != null ? JSON.parse(note) : null);
-        setLoadig(false)
-    
-      } catch (e) {
-        console.log('Veriyi alma hatası: ', e);
-      }
-    };
+  const db = getFirestore(app);
+  const auth = getAuth();
+  const signedUD = auth.currentUser?.uid;
+  
+
+
+
+  const getData = async () => {
+    setLoadig(true);
+  
+    const allData = []; // Tüm veriler için bir dizi oluşturuyoruz
+  
+    try {
+      const postsRef = query(collection(db, 'data'), where('uid', '==', signedUD));
+      const querySnapshot = await getDocs(postsRef);
+  
+      querySnapshot.forEach((doc) => {
+        const veri = { ...doc.data(), id: doc.id };
+        allData.push(veri); // Veriyi dizide topluyoruz
+      });
+  
+      setData(allData); // Tüm veriyi bir seferde state'e yazıyoruz
+      setLoadig(false);
+
+    } catch (error) {
+      console.error('Veri çekilirken hata oluştu:', error);
+      setLoadig(false);
+    }
+  };
+  
 
 
   useEffect(()=>{
     
-    getData()
-
+   
+    getData();
     if (colorScheme == "dark"){
       setTextColor('black')
     }else{
@@ -55,40 +72,7 @@ const getData = async () => {
   };
 
   const getTodayData = async () => {
-    try {
-      // Tüm veriyi al
-      const existingData = await AsyncStorage.getItem('allData');
-      let dataArray = [];
-  
-      // Eğer veri varsa, JSON'a parse et
-      if (existingData) {
-        try {
-          dataArray = JSON.parse(existingData);
-          if (!Array.isArray(dataArray)) {
-            dataArray = [];
-          }
-        } catch (error) {
-          console.log('JSON parse hatası:', error);
-        }
-      }
-  
-      // Bugünün tarihini "14 Nov 24" formatında al
-      const today = new Date().toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: '2-digit',
-      });
-  
-      // Verileri filtrele (date alanı bugünün tarihi ile eşleşenleri al)
-      const todayData = dataArray.filter(item => item.tarih === today);
-  
-      console.log('Bugünün verileri:', todayData);
-      setToday(todayData);
-      
-
-    } catch (e) {
-      console.log('Verileri alma hatası: ', e);
-    }
+   
   };
   
   
@@ -96,7 +80,7 @@ const getData = async () => {
 
 
 
-console.log(data)
+
 
 const colorScheme = useColorScheme(); 
 
@@ -163,7 +147,7 @@ const colorScheme = useColorScheme();
      
 
          <Pressable style={styles.data} 
-           onPress={() => navigation.navigate('Day' , value)}
+           onPress={() => navigation.navigate('EditOnline' , value)}
            >
      
              <View style={styles.datatexView} >
@@ -198,7 +182,9 @@ const colorScheme = useColorScheme();
        >
 
 
-     {data.map((value)=>{
+     {
+     
+     data.map((value)=>{
       
        return(
          <ScrollView 
@@ -210,7 +196,7 @@ const colorScheme = useColorScheme();
      
 
          <Pressable style={styles.data} 
-           onPress={() => navigation.navigate('Day' , value)}
+          onPress={() => navigation.navigate('EditOnline' , value)}
            >
      
              <View style={styles.datatexView} >
@@ -227,8 +213,7 @@ const colorScheme = useColorScheme();
              </View>
              
              </Pressable>
-     
-            
+      
            
            </ScrollView>
            
@@ -240,7 +225,7 @@ const colorScheme = useColorScheme();
       </ScrollView>
     }
       <Pressable 
-      onPress={() => navigation.navigate('Add')}
+      onPress={() =>  navigation.navigate("Addonline")}
       style={{position: 'absolute',
     top: '80%',
     left: '32.5%',

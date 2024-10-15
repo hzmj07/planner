@@ -10,8 +10,23 @@ import { LinearGradient } from "expo-linear-gradient"; // or `import LinearGradi
 import { Audio } from "expo-av"; // for audio feedback (click sound as you scroll)
 import * as Haptics from "expo-haptics"
 import moment from 'moment';
-import { Loading } from './loading';
-export default function Add({navigation}) {
+import { Loading } from '../loading';
+import app from "../../../../firebaseConnect";
+import { collection, addDoc  ,getFirestore} from "firebase/firestore";
+import { getAuth } from 'firebase/auth';
+
+
+
+
+
+
+
+
+export default function Addonline({navigation}) {
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const db = getFirestore(app);
 
   function formatDate(inputDate) {
     const date = new Date(inputDate); // Stringi Date nesnesine çevir
@@ -51,52 +66,40 @@ export default function Add({navigation}) {
           setAlarmString(currentTime);
         }
       }, [alarmString]);
+
+
+
+
+
       const addData = async () => {
-        setLoading(true);
-        const data = {
-          tarih: date,
-          time: alarmString,
-          not: note,
-          baslik: title,
-          bld: noti
-        };
-      
-        try {
-     
-          const existingData = await AsyncStorage.getItem('allData');
-          let dataArray = [];
-      
+
+       
+            const data = {
+                uid: user?.uid,
+                tarih: date,
+                time: alarmString,
+                not: note,
+                baslik: title,
+               
+              };
         
-          if (existingData) {
-            try {
-              dataArray = JSON.parse(existingData); 
-              if (!Array.isArray(dataArray)) { 
-                dataArray = [];
-              }
-            } catch (error) {
-              console.log('JSON parse hatası:', error);
-            }
+        try{
+            const docRef = await addDoc(collection(db, "data"), data);
+            console.log("veri eklendi" , docRef.id)
+            navigation.navigate('Homeonline');
+        }catch (error) {
+            console.error('Veri eklenirken hata oluştu:', error);
+            
           }
-      
-          
-          let lastId = await AsyncStorage.getItem('lastId');
-          lastId = lastId ? parseInt(lastId, 10) : 0; 
-      
-          const newData = { id: lastId + 1, ...data }; 
-          dataArray.push(newData); 
-      
         
-          await AsyncStorage.setItem('allData', JSON.stringify(dataArray));
-         
-          await AsyncStorage.setItem('lastId', (lastId + 1).toString());
-      
-          console.log('Veri başarıyla kaydedildi.');
-          setLoading(false);
-        } catch (e) {
-          console.log('Veriyi kaydetme hatası: ', e);
-          setLoading(false);
-        }
       };
+
+
+
+
+
+
+
 
 
       const formatTime = ({
@@ -123,10 +126,12 @@ export default function Add({navigation}) {
     };
 
     console.log(alarmString)
+
+    
   function save(){
     console.log("saved");
     addData();
-    navigation.navigate('Home')
+    
 
   };
   function cancel(){

@@ -1,9 +1,10 @@
-import { Image, StyleSheet, Platform , View ,Text ,Pressable , ScrollView , TextInput , Switch }from 'react-native';
+import { Image, StyleSheet, Platform , View ,Text ,Pressable , ScrollView , TextInput , Switch ,useColorScheme }from 'react-native';
 import React, { useState , useEffect } from 'react'
 import DateTimePicker from 'react-native-ui-datepicker';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import DateTimePickerModal from "react-native-modal-datetime-picker"
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TimerPickerModal } from "react-native-timer-picker";
@@ -19,6 +20,10 @@ import { Loading } from './loading';
 
 
 export default function Add({route , navigation}) {
+
+  const [darkMode , setDarkmode] = useState("");
+
+  const colorScheme = useColorScheme();
 
   const {time , tarih ,not , baslik , bld ,id} = route.params
 
@@ -55,10 +60,14 @@ export default function Add({route , navigation}) {
 
 
       useEffect(() => {
-        
+      
+
+        setDarkmode(colorScheme);
+        console.log("seted" , darkMode)
         if (alarmString === null) {
           setAlarmString(time);
         }
+        
       }, [alarmString]);
 
       const updateDataById = async (id) => {
@@ -211,7 +220,7 @@ export default function Add({route , navigation}) {
   console.log( "tepyof date", typeof date)
 
   return (
-    <View style={styles.main} >
+    <View style={colorScheme === 'dark' ? [styles.main , {backgroundColor:"#0F0F0F"} ]: styles.main} >
 
 
       <View style={styles.head} >
@@ -277,7 +286,7 @@ export default function Add({route , navigation}) {
             LinearGradient={LinearGradient}
             Haptics={Haptics}
             styles={{
-                theme: "dark",
+                theme:"dark",
             }}
             modalProps={{
                 overlayOpacity: 0.1,
@@ -429,7 +438,7 @@ const styles = StyleSheet.create({
     },
 
     data:{
-      backgroundColor:"#414b3b",
+      backgroundColor:"#00204C",
       borderWidth:0,
       width:"95%",
       height:"60%",
