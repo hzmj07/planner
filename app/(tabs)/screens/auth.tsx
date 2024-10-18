@@ -1,29 +1,35 @@
 import React, { useEffect , useState } from 'react';
 import { View, Button, StyleSheet, Alert , Text , TextInput, Pressable , useColorScheme} from 'react-native';
 import app from "../../../firebaseConnect"
-import { getAuth ,GoogleAuthProvider , createUserWithEmailAndPassword  , signInWithEmailAndPassword} from "firebase/auth";
+import { signInWithRedirect,getAuth ,GoogleAuthProvider , createUserWithEmailAndPassword  , signInWithEmailAndPassword ,signInWithPopup } from "firebase/auth";
+import { Loading } from './loading';
 
-
+const provider = new GoogleAuthProvider();
+provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 
 
 
 const LoginScreen = ({ navigation }) => {
 
+ 
 
 
    function Registar(auth , email , password){
 
 
-
+    setLoading(true)
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed up 
         const user = userCredential.user;
-        console.log("registared", user)
+        console.log("registared", user);
+        setLoading(false)
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        setLoading(false)
         // ..
       });
     };
@@ -32,12 +38,14 @@ const LoginScreen = ({ navigation }) => {
 
     
      function login(auth , email , password , navigation ) {
+      setLoading(true)
     
         signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in 
         const user = userCredential.user;
         navigation.navigate('Homeonline');
+        setLoading(false)
         console.log("loging in" , user.uid);
         
 
@@ -45,8 +53,10 @@ const LoginScreen = ({ navigation }) => {
         // ...
       })
       .catch((error) => {
-        const errorCode = error.code;
+        
         const errorMessage = error.message;
+        console.error( errorMessage);
+        setLoading(false)
       });
     
     }
@@ -58,14 +68,22 @@ const LoginScreen = ({ navigation }) => {
   const colorScheme = useColorScheme()
 
   
+  
 
   function today(){
     setTab(true);
+    clear()
    
   }
+function clear(){
+    setLoading(false);
+    setEmail("");
+    setPassword("");
+ }
 
   function calendar(){
     setTab(false);
+    clear();
     
     
   };
@@ -74,9 +92,13 @@ const LoginScreen = ({ navigation }) => {
   const [ tab , setTab ] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading , setLoading] = useState(false);
   const provider = new GoogleAuthProvider();
   const auth = getAuth(app);
+  auth.languageCode = 'it';
  
+  
+
 
   return (
     <View style={colorScheme === 'dark' ? [styles.main , {backgroundColor:"#0F0F0F"}] : [styles.main , {backgroundColor:"#EBEBEB"}]}
@@ -119,17 +141,20 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Şifre"
         value={password}
         onChangeText={setPassword}
+        secureTextEntry={true}
       />
 
 
 
-
-     <Pressable
+{loading ? <Loading renk={"#EFBA19"} /> :<Pressable
      style={[styles.buton , {marginTop:16}]}
      onPress={()=>{Registar(auth, email , password)}}
      >
           <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:20}} >Registar</Text>
-      </Pressable> 
+      </Pressable>  }
+
+
+     
 
 </View> : 
 
@@ -139,7 +164,7 @@ const LoginScreen = ({ navigation }) => {
       placeholderTextColor="#EFBA19"
         style={styles.input}
         placeholder="E-posta"
-        value={email}
+       value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
@@ -150,18 +175,22 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Şifre"
         value={password}
         onChangeText={setPassword}
+        secureTextEntry={true}
       />
 
 
-
-
-     <Pressable
+      {loading ? <Loading renk={"#EFBA19"} /> :<Pressable
      style={[styles.buton, {marginTop:22}]}
      onPress={()=> login(auth, email , password , navigation)}
      >
           <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:20}} >LOGIN</Text>
-      </Pressable> 
+      </Pressable> }
 
+     
+
+
+     
+   
 
       <Pressable 
       onPress={(() =>navigation.navigate('Home'))}
@@ -170,6 +199,8 @@ const LoginScreen = ({ navigation }) => {
             <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:18}} >GUEST</Text>
 
       </Pressable>
+
+
 
 </View>
 

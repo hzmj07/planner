@@ -136,7 +136,7 @@ export default function Addonline({navigation}) {
   };
   function cancel(){
     console.log("canceled")
-    navigation.navigate('Home')
+    navigation.navigate('Homeonline')
   };
 ///////////////
   const handleConfirm = (date) => {
@@ -193,7 +193,7 @@ export default function Addonline({navigation}) {
                  onPress={showDatePicker} 
                 style={styles.tabs} >
                   <View style={{marginLeft:"8%"}} >
-                     <FontAwesome6    name="calendar" size={35} color="#8ca87c" />
+                     <FontAwesome6    name="calendar" size={35} color="#EFBA19" />
                   </View>
                   <Text style={styles.dataTex} >{date}</Text></Pressable>
 
@@ -216,7 +216,7 @@ export default function Addonline({navigation}) {
                  onPress={()=>{setShowPicker(true)}} 
                 style={styles.tabs} >
                   <View style={{marginLeft:"8%"}} >
-                     <FontAwesome6    name="clock" size={35} color="#8ca87c" />
+                     <FontAwesome6    name="clock" size={35} color="#EFBA19" />
                   </View>
                  
                   <Text style={styles.dataTex} >{alarmString}</Text></Pressable>
@@ -247,7 +247,7 @@ export default function Addonline({navigation}) {
           <View style={{height:"80%",width:"100%", alignItems:"center",marginTop:"12%" }} >
                     <TextInput
                     onChangeText={(text)=>{setTitle(text)}} 
-                    placeholderTextColor="#8ca87c"
+                    placeholderTextColor="#EFBA19"
                     placeholder='TITLE'
                     style={styles.input} >
 
@@ -259,7 +259,7 @@ export default function Addonline({navigation}) {
 
                     <TextInput
                     onChangeText={(note)=>{setNote(note)}} 
-                    placeholderTextColor="#8ca87c"
+                    placeholderTextColor="#EFBA19"
                     placeholder='NOTE'
                     style={styles.input} >
 
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
     width:"80%",
     alignItems:"center",
     borderBottomWidth:2,
-    borderColor:"#8ca87c",
+    borderColor:"#EFBA19",
     flexDirection:"row"
     
   },
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
       marginLeft:"8%",
       fontSize:35,
       fontWeight:"bold",
-      color:"#8ca87c",
+      color:"#EFBA19",
      
     },
     datatexView:{
@@ -435,12 +435,12 @@ const styles = StyleSheet.create({
       height:"20%",
       width:"90%",
       borderBottomWidth:2,
-      borderColor:"#8ca87c",
+      borderColor:"#EFBA19",
       marginBottom:16,
       textAlign:"center",
       fontSize:35,
       fontWeight:"bold",
-      color:"#8ca87c",
+      color:"#EFBA19",
       
 
     },
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
       saveBT:{
         fontSize:20,
         fontWeight:"bold",
-        color:"#8ca87c"
+        color:"#EFBA19"
       }
 
   
