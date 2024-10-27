@@ -184,7 +184,7 @@ const colorScheme = useColorScheme();
 
     {
        tab ? <ScrollView
-       style={{flex:1}}
+       style={{flex:1, width:"100%"}}
        refreshControl={ <RefreshControl refreshing={refresh} onRefresh={getTodayData} /> }
        >
        { loading ? <Loading renk={colorScheme === 'dark' ? "white" :"black"} /> : <ScrollView
@@ -240,7 +240,7 @@ const colorScheme = useColorScheme();
    </ScrollView>
 } 
       </ScrollView> : <ScrollView
-       style={{flex:1}}
+       style={{flex:1, width:"100%"}}
       refreshControl={ <RefreshControl refreshing={refresh} onRefresh={getData} /> }
       >
        { loading ? <Loading renk={"black"} /> : <ScrollView
@@ -476,24 +476,23 @@ const styles = StyleSheet.create({
 
     },
     scroll:{
-      width:460,
+      width:"100%",
       alignItems:"center",
+      justifyContent:"center",
       borderWidth:0,
-      
-      
     },
 
     data:{
       backgroundColor:"#00204C",
       borderWidth:0,
-      width:"89%",
+      width:"95%",
       height:150,
       marginBottom:18,
       borderRadius:41,
        
       justifyContent:"center",
       alignItems:"flex-start",
-      marginRight:"4%"
+      
       
     },
     dataTex:{
