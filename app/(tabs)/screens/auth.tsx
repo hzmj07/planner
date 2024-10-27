@@ -3,6 +3,7 @@ import { View, Button, StyleSheet, Alert , Text , TextInput, Pressable , useColo
 import app from "../../../firebaseConnect"
 import { signInWithRedirect,getAuth ,GoogleAuthProvider , createUserWithEmailAndPassword  , signInWithEmailAndPassword ,signInWithPopup } from "firebase/auth";
 import { Loading } from './loading';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
@@ -12,6 +13,43 @@ provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
 const LoginScreen = ({ navigation }) => {
 
  
+
+
+   async function control(){
+       setİSloading(true)
+      const varolan = await AsyncStorage.getItem("userdata");
+      const savedUser = JSON.parse(varolan);
+  
+      if(varolan){
+        login(auth, savedUser.email , savedUser.pass , navigation);
+        console.log("oto giriş");
+      
+      }else{
+        setİSloading(false)
+      }
+
+       
+  };
+
+  useEffect(() => {
+   control();
+
+  }, []);
+
+
+  async function addUser(email, password) {
+    const uData = {
+      email: email,
+      pass: password
+    };
+  
+    try {
+      await AsyncStorage.setItem("userdata", JSON.stringify(uData));
+      console.log("Data saved successfully.");
+    } catch (error) {
+      console.log("Error saving data:", error);
+    }
+  }
 
 
    function Registar(auth , email , password){
@@ -47,6 +85,9 @@ const LoginScreen = ({ navigation }) => {
         navigation.navigate('Homeonline');
         setLoading(false)
         console.log("loging in" , user.uid);
+        addUser(email , password);
+        setİSloading(false)
+        
         
 
 
@@ -93,6 +134,7 @@ function clear(){
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading , setLoading] = useState(false);
+  const [isloading , setİSloading] = useState(false);
   const provider = new GoogleAuthProvider();
   const auth = getAuth(app);
   auth.languageCode = 'it';
@@ -104,109 +146,116 @@ function clear(){
     <View style={colorScheme === 'dark' ? [styles.main , {backgroundColor:"#0F0F0F"}] : [styles.main , {backgroundColor:"#EBEBEB"}]}
     
     >
-      <View  style={{flexDirection:"row" , alignItems:"center", justifyContent:"center" , height:"15%"}} >
+      {isloading ?<View style={{flex:1 , justifyContent:"center"}} >
+         <Loading renk={colorScheme== "dark" ? "white": "dark"} />
+      </View> :  <View style={{flex:1 , width:"100%"}}
+    
+    > 
+     <View  style={{flexDirection:"row" , alignItems:"center", justifyContent:"center" , height:"15%"}} >
 
 
 
-      <Pressable
-       onPress={today}
-      style={[styles.tabs, tab ? styles.true : styles.false]} ><Text
-      style={[styles.tabTx,  tab ? [styles.tabTx , {color:"black"}] : colorScheme === 'dark' ? [styles.tabTx , {color:"white"}]  : [styles.tabTx , {color:"black"}] ]}
-      >REGİSTAR</Text></Pressable>
+<Pressable
+ onPress={today}
+style={[styles.tabs, tab ? styles.true : styles.false]} ><Text
+style={[styles.tabTx,  tab ? [styles.tabTx , {color:"black"}] : colorScheme === 'dark' ? [styles.tabTx , {color:"white"}]  : [styles.tabTx , {color:"black"}] ]}
+>REGİSTAR</Text></Pressable>
 
 
-      <Pressable 
-      onPress={calendar}
-      style={[styles.tabs, tab ? styles.false : styles.true]} ><Text
-      style={[styles.tabTx,  tab ? colorScheme === 'dark' ? [styles.tabTx , {color:"white"}]  : [styles.tabTx , {color:"black"}] : [styles.tabTx , {color:"black"}] ]}
-      >LOGİN</Text></Pressable>
+<Pressable 
+onPress={calendar}
+style={[styles.tabs, tab ? styles.false : styles.true]} ><Text
+style={[styles.tabTx,  tab ? colorScheme === 'dark' ? [styles.tabTx , {color:"white"}]  : [styles.tabTx , {color:"black"}] : [styles.tabTx , {color:"black"}] ]}
+>LOGİN</Text></Pressable>
 
-      </View>
-    <View style={{ borderWidth:0 , width:"100%" , alignItems:"center" , justifyContent:"center" , height:"60%"}} >
-    {
-      tab ? <View style={styles.container} >
-      <Text style={styles.title}>HESAP OLUŞTUR</Text>
-      <TextInput
-      placeholderTextColor="#EFBA19"
-        style={styles.input}
-        placeholder="E-posta"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-      placeholderTextColor="#EFBA19"
-        style={styles.input}
-        placeholder="Şifre"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-      />
+</View>
+<View style={{ borderWidth:0 , width:"100%" , alignItems:"center" , justifyContent:"center" , height:"60%"}} >
+{
+tab ? <View style={styles.container} >
+<Text style={styles.title}>HESAP OLUŞTUR</Text>
+<TextInput
+placeholderTextColor="#EFBA19"
+  style={styles.input}
+  placeholder="E-posta"
+  value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+  autoCapitalize="none"
+/>
+<TextInput
+placeholderTextColor="#EFBA19"
+  style={styles.input}
+  placeholder="Şifre"
+  value={password}
+  onChangeText={setPassword}
+  secureTextEntry={true}
+/>
 
 
 
 {loading ? <Loading renk={"#EFBA19"} /> :<Pressable
-     style={[styles.buton , {marginTop:16}]}
-     onPress={()=>{Registar(auth, email , password)}}
-     >
-          <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:20}} >Registar</Text>
-      </Pressable>  }
+style={[styles.buton , {marginTop:16}]}
+onPress={()=>{Registar(auth, email , password)}}
+>
+    <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:20}} >Registar</Text>
+</Pressable>  }
 
 
-     
+
 
 </View> : 
 
 <View style={styles.container} >
-      <Text style={styles.title}>GİRİŞ YAP</Text>
-      <TextInput
-      placeholderTextColor="#EFBA19"
-        style={styles.input}
-        placeholder="E-posta"
-       value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-      placeholderTextColor="#EFBA19"
-        style={styles.input}
-        placeholder="Şifre"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry={true}
-      />
+<Text style={styles.title}>GİRİŞ YAP</Text>
+<TextInput
+placeholderTextColor="#EFBA19"
+  style={styles.input}
+  placeholder="E-posta"
+ value={email}
+  onChangeText={setEmail}
+  keyboardType="email-address"
+  autoCapitalize="none"
+/>
+<TextInput
+placeholderTextColor="#EFBA19"
+  style={styles.input}
+  placeholder="Şifre"
+  value={password}
+  onChangeText={setPassword}
+  secureTextEntry={true}
+/>
 
 
-      {loading ? <Loading renk={"#EFBA19"} /> :<Pressable
-     style={[styles.buton, {marginTop:22}]}
-     onPress={()=> login(auth, email , password , navigation)}
-     >
-          <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:20}} >LOGIN</Text>
-      </Pressable> }
-
-     
+{loading ? <Loading renk={"#EFBA19"} /> :<Pressable
+style={[styles.buton, {marginTop:22}]}
+onPress={()=> login(auth, email , password , navigation)}
+>
+    <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:20}} >LOGIN</Text>
+</Pressable> }
 
 
-     
-   
 
-      <Pressable 
-      onPress={(() =>navigation.navigate('Home'))}
-      style={[styles.buton , {width:"20%" , height:20 , backgroundColor:""}]} >
-            
-            <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:18}} >GUEST</Text>
 
-      </Pressable>
+
+
+
+<Pressable 
+onPress={(() =>navigation.navigate('Home'))}
+style={[styles.buton , {width:"20%" , height:20 , backgroundColor:""}]} >
+      
+      <Text style={{color:"#EFBA19" , fontWeight:"bold" , fontSize:18}} >GUEST</Text>
+
+</Pressable>
 
 
 
 </View>
 
-    }
+}
 
-    </View>
+</View>
+    </View>  }
+     
     
 
 
@@ -230,6 +279,7 @@ const styles = StyleSheet.create({
   main:{
     flex:1,
     alignItems:"center",
+  
     
     
   },

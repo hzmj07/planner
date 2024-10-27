@@ -306,8 +306,9 @@ const colorScheme = useColorScheme();
           <View style={styles.headModel} >
           <MaterialCommunityIcons 
             onPress={toggleModal}
-            style={{marginRight:"9%"}} name="account-circle-outline" size={80} color={colorScheme === 'dark' ? "#BFD1E5" : "#2F2F2F"} />
-            <Text style={[colorScheme === 'dark' ? {fontWeight:"bold" , fontSize:32 ,   color:"#BFD1E5"  } : {fontWeight:"bold" , fontSize:32 , marginLeft:"9%" ,color:"#2F2F2F"  }]} >{userName}</Text> 
+            style={{marginRight:"9%"}} name="account-circle-outline" size={75} color={"#BFD1E5"} />
+
+            <Text style={{fontWeight:"bold" , fontSize:32 ,   color:"#BFD1E5"}} >{userName}</Text> 
         </View>
 
         
