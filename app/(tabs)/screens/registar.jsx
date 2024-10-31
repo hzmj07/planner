@@ -135,12 +135,9 @@ const Registar = ({navigation}) => {
               {errors.password && touched.password && (
                 <Text style={styles.errorText}>{errors.password}</Text>
               )}
-              <Pressable
-                onPress={handleSubmit}
-                style={styles.Pressable}
-              >
-                <Text>Registar</Text>
-              </Pressable>
+             {loading ? <Loading renk={"black"}/> : <Pressable onPress={handleSubmit} style={styles.Pressable}>
+                <Text style={{ color: "white", fontSize: 18 }}>Registar</Text>
+              </Pressable>}
               <Pressable
                 onPress={() => navigation.navigate("auth")}
                 style={styles.toggleTextContainer}
@@ -201,6 +198,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor:"#00204C"
   },
 });
 

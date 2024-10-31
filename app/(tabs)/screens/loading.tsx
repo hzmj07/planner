@@ -6,7 +6,7 @@ import {
 
 export const Loading=({renk})=>{
     return(<View style={[{margin:12, alignItems:"center" ,justifyContent:"center" }]} >
-            <ActivityIndicator size="large" color={renk} />
+            <ActivityIndicator size="small" color={renk} />
 
     </View>)
 }

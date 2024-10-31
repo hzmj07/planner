@@ -9,6 +9,7 @@ import onlineHome from './screens/online/homeOnline';
 import Addonline from './screens/online/addOnline';
 import EditOnline from './screens/online/editOnline';
 import Registar from "./screens/registar"
+import { AuthProvider } from '../../context/context';
 
 
 
@@ -16,6 +17,7 @@ function index() {
 
   const Stack = createStackNavigator();
   return (
+    <AuthProvider>
     <NavigationContainer 
    
     independent={true} >
@@ -68,6 +70,7 @@ function index() {
 
 
     </NavigationContainer>
+    </AuthProvider>
   );
 }
 

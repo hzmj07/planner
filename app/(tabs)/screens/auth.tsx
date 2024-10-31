@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useContext } from "react";
 import {
   View,
   Text,
@@ -13,57 +13,54 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-
-import app from "../../../firebaseConnect"
-import { signInWithRedirect,getAuth ,GoogleAuthProvider , createUserWithEmailAndPassword  , signInWithEmailAndPassword ,signInWithPopup } from "firebase/auth";
-import { Loading } from './loading';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {AuthContext} from "../../../context/context"
 
 
+import app from "../../../firebaseConnect";
+import {
+  signInWithRedirect,
+  getAuth,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
+import { Loading } from "./loading";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const App = ({ navigation }) => {
 
 
-
-
-const App = ({navigation}) => {
-
-  const [password, setPassword] = useState('');
-  const [loading , setLoading] = useState(false);
-  const [isloading , setİSloading] = useState(false);
   const auth = getAuth(app);
 
+  const { user, isLoading , Login, logout , setLoading } = useContext(AuthContext);
 
 
-
-
-  function login(auth , email , password , navigation ) {
+  function login(auth, email, password, navigation) {
     setLoading(true)
-  
-      signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      navigation.navigate('Homeonline');
-      setLoading(false)
-      console.log("loging in" , user.uid);
-    //  addUser(email , password);
-      setİSloading(false)
-      
-      
 
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        Login(user);
 
-      // ...
-    })
-    .catch((error) => {
-      
-      const errorMessage = error.message;
-      console.error( errorMessage);
-      setLoading(false)
-    });
   
+        
+        navigation.navigate("Homeonline");
+        
+        console.log("loging in", user.uid);
+        //  addUser(email , password);
+        
+        // ...
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        console.error(errorMessage);
+        setLoading(false)
+        
+      });
   }
-
-
-
 
   const loginSchema = Yup.object().shape({
     email: Yup.string().email("Geçersiz email").required("Gerekli"),
@@ -71,8 +68,8 @@ const App = ({navigation}) => {
   });
 
   const handleSubmit = (values) => {
-    console.log(values)
-    login(auth , values.email , values.password , navigation)
+    console.log(values);
+    login(auth, values.email, values.password, navigation);
   };
 
   return (
@@ -81,13 +78,18 @@ const App = ({navigation}) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
     >
-      <View style={{ flex: 1,  justifyContent:"center" , alignItems:"center" }}>
-        
-        <View >
-          <Text style={{ fontSize: 40, fontWeight: "bold" ,color:"white" }}>Planner</Text>
+     {isLoading ? <View style={{flex:1 , alignItems:"center" , justifyContent:"center" }} ><Loading renk={"white"} /></View>:<View style={{flex:1}} >
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View>
+          <Text style={{ fontSize: 40, fontWeight: "bold", color: "white" }}>
+            Planner
+          </Text>
         </View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+
+    
+
         <View style={{ width: "100%" }}>
           <Text style={{ fontSize: 30, fontWeight: "bold" }}>LOGİN</Text>
         </View>
@@ -127,12 +129,11 @@ const App = ({navigation}) => {
               {errors.password && touched.password && (
                 <Text style={styles.errorText}>{errors.password}</Text>
               )}
-              <Pressable
-                onPress={handleSubmit}
-                style={styles.Pressable}
-              >
-                <Text>Login</Text>
-              </Pressable>
+              
+
+              {isLoading ? <Loading renk={"black"}/> : <Pressable onPress={handleSubmit} style={styles.Pressable}>
+                <Text style={{ color: "white", fontSize: 18 }}>Login</Text>
+              </Pressable>}
               <Pressable
                 onPress={() => navigation.navigate("registar")}
                 style={styles.toggleTextContainer}
@@ -143,6 +144,9 @@ const App = ({navigation}) => {
           )}
         </Formik>
       </ScrollView>
+
+      </View>
+      }
     </KeyboardAvoidingView>
   );
 };
@@ -151,7 +155,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-     backgroundColor: "#00204C"
+    backgroundColor: "#00204C",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -160,11 +164,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     borderTopRightRadius: 50,
     backgroundColor: "#f0f4f8",
-
   },
   formContainer: {
     width: "100%",
-    
   },
   input: {
     height: 40,
@@ -181,7 +183,6 @@ const styles = StyleSheet.create({
   },
   toggleTextContainer: {
     marginTop: 15,
-  
   },
   toggleText: {
     color: "#007bff",
@@ -193,6 +194,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#00204C",
   },
 });
 
