@@ -8,7 +8,7 @@ import LoginScreen from './screens/auth';
 import onlineHome from './screens/online/homeOnline';
 import Addonline from './screens/online/addOnline';
 import EditOnline from './screens/online/editOnline';
-
+import Registar from "./screens/registar"
 
 
 
@@ -56,7 +56,11 @@ function index() {
         name="EditOnline" component={EditOnline} />
 
 
-     
+<Stack.Screen
+         options={{ headerShown: false }}
+        name="registar" component={Registar} />
+
+
 
         
       </Stack.Navigator>

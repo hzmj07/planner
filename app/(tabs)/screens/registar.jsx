@@ -13,54 +13,63 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-
-import app from "../../../firebaseConnect"
 import { signInWithRedirect,getAuth ,GoogleAuthProvider , createUserWithEmailAndPassword  , signInWithEmailAndPassword ,signInWithPopup } from "firebase/auth";
 import { Loading } from './loading';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import app from "../../../firebaseConnect"
+
+
+
+
+    
+
+const Registar = ({navigation}) => {
+
+
+
+
+
+   
+    const [password, setPassword] = useState('');
+    const [loading , setLoading] = useState(false);
+    const [isloading , setİSloading] = useState(false);
+    const auth = getAuth(app);
+
+    
+    function reg(auth , email , password){
+    
+    
+        setLoading(true)
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            // Signed up 
+            const user = userCredential.user;
+            console.log("registared", user);
+            setLoading(false)
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode, errorMessage);
+            setLoading(false)
+            // ..
+          });
+        };
+        
 
 
 
 
 
 
-const App = ({navigation}) => {
-
-  const [password, setPassword] = useState('');
-  const [loading , setLoading] = useState(false);
-  const [isloading , setİSloading] = useState(false);
-  const auth = getAuth(app);
 
 
 
 
 
-  function login(auth , email , password , navigation ) {
-    setLoading(true)
-  
-      signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      navigation.navigate('Homeonline');
-      setLoading(false)
-      console.log("loging in" , user.uid);
-    //  addUser(email , password);
-      setİSloading(false)
-      
-      
 
 
-      // ...
-    })
-    .catch((error) => {
-      
-      const errorMessage = error.message;
-      console.error( errorMessage);
-      setLoading(false)
-    });
-  
-  }
+
+
 
 
 
@@ -71,8 +80,7 @@ const App = ({navigation}) => {
   });
 
   const handleSubmit = (values) => {
-    console.log(values)
-    login(auth , values.email , values.password , navigation)
+    reg(auth , values.email , values.password)
   };
 
   return (
@@ -89,7 +97,7 @@ const App = ({navigation}) => {
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={{ width: "100%" }}>
-          <Text style={{ fontSize: 30, fontWeight: "bold" }}>LOGİN</Text>
+          <Text style={{ fontSize: 30, fontWeight: "bold" }}>Registar</Text>
         </View>
 
         <Formik
@@ -131,13 +139,13 @@ const App = ({navigation}) => {
                 onPress={handleSubmit}
                 style={styles.Pressable}
               >
-                <Text>Login</Text>
+                <Text>Registar</Text>
               </Pressable>
               <Pressable
-                onPress={() => navigation.navigate("registar")}
+                onPress={() => navigation.navigate("auth")}
                 style={styles.toggleTextContainer}
               >
-                <Text style={styles.toggleText}>Hesabınız yoksa oluştur</Text>
+                <Text style={styles.toggleText}>Hesabın var mı ? Giriş yap</Text>
               </Pressable>
             </View>
           )}
@@ -196,4 +204,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default Registar;
