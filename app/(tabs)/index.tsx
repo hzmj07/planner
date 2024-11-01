@@ -14,6 +14,7 @@ import { AuthProvider } from '../../context/context';
 
 
 function index() {
+  
 
   const Stack = createStackNavigator();
   return (

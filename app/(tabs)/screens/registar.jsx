@@ -13,66 +13,41 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { signInWithRedirect,getAuth ,GoogleAuthProvider , createUserWithEmailAndPassword  , signInWithEmailAndPassword ,signInWithPopup } from "firebase/auth";
-import { Loading } from './loading';
-import app from "../../../firebaseConnect"
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import {
+  signInWithRedirect,
+  getAuth,
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
+import { Loading } from "./loading";
+import app from "../../../firebaseConnect";
 
+const Registar = ({ navigation }) => {
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isloading, setİSloading] = useState(false);
+  const auth = getAuth(app);
 
-
-
-    
-
-const Registar = ({navigation}) => {
-
-
-
-
-
-   
-    const [password, setPassword] = useState('');
-    const [loading , setLoading] = useState(false);
-    const [isloading , setİSloading] = useState(false);
-    const auth = getAuth(app);
-
-    
-    function reg(auth , email , password){
-    
-    
-        setLoading(true)
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Signed up 
-            const user = userCredential.user;
-            console.log("registared", user);
-            setLoading(false)
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(errorCode, errorMessage);
-            setLoading(false)
-            // ..
-          });
-        };
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  function reg(auth, email, password) {
+    setLoading(true);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed up
+        const user = userCredential.user;
+        console.log("registared", user);
+        setLoading(false);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        setLoading(false);
+        // ..
+      });
+  }
 
   const loginSchema = Yup.object().shape({
     email: Yup.string().email("Geçersiz email").required("Gerekli"),
@@ -80,7 +55,7 @@ const Registar = ({navigation}) => {
   });
 
   const handleSubmit = (values) => {
-    reg(auth , values.email , values.password)
+    reg(auth, values.email, values.password);
   };
 
   return (
@@ -89,12 +64,23 @@ const Registar = ({navigation}) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
     >
-      <View style={{ flex: 1,  justifyContent:"center" , alignItems:"center" }}>
-        
-        <View >
-          <Text style={{ fontSize: 40, fontWeight: "bold" ,color:"white" }}>Planner</Text>
-        </View>
-      </View>
+     <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <MaterialCommunityIcons name="notebook" size={50} color="white" />
+            <View style={{marginLeft:12}} >
+              <Text
+                style={{ fontSize: 40, fontWeight: "bold", color: "white" }}
+              >
+                Planner
+              </Text>
+            </View>
+          </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={{ width: "100%" }}>
           <Text style={{ fontSize: 30, fontWeight: "bold" }}>Registar</Text>
@@ -135,14 +121,20 @@ const Registar = ({navigation}) => {
               {errors.password && touched.password && (
                 <Text style={styles.errorText}>{errors.password}</Text>
               )}
-             {loading ? <Loading renk={"black"}/> : <Pressable onPress={handleSubmit} style={styles.Pressable}>
-                <Text style={{ color: "white", fontSize: 18 }}>Registar</Text>
-              </Pressable>}
+              {loading ? (
+                <Loading renk={"black"} />
+              ) : (
+                <Pressable onPress={handleSubmit} style={styles.Pressable}>
+                  <Text style={{ color: "white", fontSize: 18 }}>Registar</Text>
+                </Pressable>
+              )}
               <Pressable
                 onPress={() => navigation.navigate("auth")}
                 style={styles.toggleTextContainer}
               >
-                <Text style={styles.toggleText}>Hesabın var mı ? Giriş yap</Text>
+                <Text style={styles.toggleText}>
+                  Hesabın var mı ? Giriş yap
+                </Text>
               </Pressable>
             </View>
           )}
@@ -156,7 +148,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-     backgroundColor: "#00204C"
+    backgroundColor: "#00204C",
   },
   scrollContainer: {
     flexGrow: 1,
@@ -165,16 +157,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     borderTopRightRadius: 50,
     backgroundColor: "#f0f4f8",
-
   },
   formContainer: {
     width: "100%",
-    
   },
   input: {
     height: 40,
-    borderColor: "#007bff",
-    borderWidth: 1,
+    backgroundColor: "#DBDBDB",
+
     marginBottom: 10,
     marginTop: 10,
     paddingHorizontal: 20,
@@ -186,7 +176,6 @@ const styles = StyleSheet.create({
   },
   toggleTextContainer: {
     marginTop: 15,
-  
   },
   toggleText: {
     color: "#007bff",
@@ -198,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor:"#00204C"
+    backgroundColor: "#00204C",
   },
 });
 
